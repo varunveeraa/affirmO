@@ -17,7 +17,26 @@ const db = getFirestore(app);
 
 const ProfilePage = () => {
   const [affirmations, setAffirmations] = useState([]);
-  const [viewing, setViewing] = useState(''); // '' for none, 'liked' or 'saved'
+  const [viewing, setViewing] = useState(''); 
+  const [firstName, setFirstName] = useState("");
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const docRef = doc(db, 'userData', 'data');
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setFirstName(data.firstName);
+        setStreak(data.streak);
+      } else {
+        console.log("No user data found!");
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const fetchAffirmations = async (type) => {
     const docRef = doc(db, 'affirmation', type);
@@ -47,6 +66,8 @@ const ProfilePage = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Profile Page</Text>
+      <Text style={styles.profileText}>Name: {firstName}</Text>
+      <Text style={styles.profileText}>Streak: {streak}</Text>
 
       {!viewing && (
         <View style={styles.buttonContainer}>
@@ -97,6 +118,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  profileText: {
+    fontSize: 18,
+    marginBottom: 10,
     textAlign: 'center',
     color: '#333',
   },
